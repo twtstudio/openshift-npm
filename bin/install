@@ -1,0 +1,20 @@
+#!/bin/bash -e
+source $OPENSHIFT_CARTRIDGE_SDK_BASH
+
+if [[ -n "$OPENSHIFT_NODEJS_VERSION" ]]; then
+  client_error "Don't add this cartridge for a Node.JS-contained Gear"
+  exit 1
+fi
+
+if npm -v 2>/dev/null; then
+  echo ""
+else
+  client_error "Native npm not found."
+  exit 127
+fi
+
+touch "$OPENSHIFT_HOMEDIR"/.npmrc
+mkdir "$OPENSHIFT_HOMEDIR"/.node-gyp
+chown `id -u $OPENSHIFT_GEAR_UUID` -R "$OPENSHIFT_HOMEDIR"/.npmrc "$OPENSHIFT_HOMEDIR"/.node-gyp
+npm config set tmp $OPENSHIFT_TMP_DIR
+

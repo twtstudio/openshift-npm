@@ -1,0 +1,35 @@
+#!/bin/bash -e
+
+function status() {
+    client_result `npm -v`
+}
+
+# http://openshift.github.io/documentation-latest/oo_cartridge_developers_guide.html#default-build-lifecycle
+# `build` of the secondary cartridge is not in the default build lifecycle,
+# but `start` is. 
+function start() {
+    pushd "$OPENSHIFT_REPO_DIR" > /dev/null
+    if force_clean_build_enabled_for_latest_deployment; then
+        find $OPENSHIFT_HOMEDIR/.node_modules/ -mindepth 1 -delete
+    fi
+    [ -f "package.json" ] || return 0;
+    if [ -d "node_modules" ]; then
+        rsync -ap node_modules/ $OPENSHIFT_HOMEDIR/.node_modules/
+        rm -rf node_modules
+    fi
+    ln -sf $OPENSHIFT_HOMEDIR/.node_modules node_modules
+    _npm_off_enabled_ || npm install
+    popd > /dev/null
+}
+
+function _npm_off_enabled_() {
+    test -e "$OPENSHIFT_REPO_DIR/.openshift/markers/npm_off" > /dev/null 2>&1
+}
+
+source $OPENSHIFT_CARTRIDGE_SDK_BASH
+
+case "$1" in
+    start)           start  ;;
+    status)          status ;;
+    *) exit 0;
+esac
