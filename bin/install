@@ -14,7 +14,8 @@ else
 fi
 
 touch "$OPENSHIFT_HOMEDIR"/.npmrc
+touch "$OPENSHIFT_HOMEDIR"/.config
 mkdir "$OPENSHIFT_HOMEDIR"/.node-gyp
-chown `id -u $OPENSHIFT_GEAR_UUID` -R "$OPENSHIFT_HOMEDIR"/.npmrc "$OPENSHIFT_HOMEDIR"/.node-gyp
+chown `id -u $OPENSHIFT_GEAR_UUID` -R "$OPENSHIFT_HOMEDIR"/.npmrc "$OPENSHIFT_HOMEDIR"/.node-gyp "$OPENSHIFT_HOMEDIR"/.config
 npm config set tmp $OPENSHIFT_TMP_DIR
 
